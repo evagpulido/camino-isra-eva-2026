@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camino Isra & Eva · Sarria → Santiago 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <style>
+    :root {
+      --terracota:   #8B3A1A;
+      --terracota-claro: #C4622A;
+      --verde:       #2D5016;
+      --verde-claro: #4A7A24;
+      --dorado:      #C4872A;
+      --fondo:       #F7F3E9;
+      --crema:       #FEFCF5;
+      --texto:       #2C2416;
+      --texto-suave: #7A6A52;
+      --borde:       #DDD5C0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+      line-height: 1.7;
+    }
+
+    /* ── NAVEGACIÓN ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 1000;
+      background: rgba(44, 36, 22, 0.93);
+      backdrop-filter: blur(6px);
+      padding: 0.75rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    nav .logo {
+      font-family: 'Playfair Display', serif;
+      color: #F7F3E9; font-size: 1.1rem; letter-spacing: 0.04em;
+    }
+    nav .logo span { color: var(--dorado); }
+    nav ul { list-style: none; display: flex; gap: 1.5rem; }
+    nav ul a {
+      color: #D5C8A8; text-decoration: none;
+      font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    nav ul a:hover { color: var(--dorado); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      background:
+        linear-gradient(to bottom, rgba(30,20,10,0.55) 0%, rgba(44,36,22,0.3) 60%, rgba(247,243,233,1) 100%),
+        url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Cathedral_of_Santiago_de_Compostela.jpg/1280px-Cathedral_of_Santiago_de_Compostela.jpg') center/cover no-repeat;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 6rem 1.5rem 4rem;
+    }
+    .hero-shell {
+      font-size: 3.5rem; margin-bottom: 1rem;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+    }
+    #hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      color: #FEFCF5; font-weight: 600; line-height: 1.2;
+      text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+      margin-bottom: 0.5rem;
+    }
+    #hero h1 em { color: var(--dorado); font-style: italic; }
+    #hero .subtitulo {
+      font-size: 1.1rem; color: #E8DFC8; letter-spacing: 0.12em;
+      text-transform: uppercase; margin-bottom: 2.5rem;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+    }
+    .stats-hero {
+      display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 3rem;
+    }
+    .stat-hero {
+      background: rgba(254,252,245,0.12);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(254,252,245,0.25);
+      border-radius: 12px; padding: 1rem 1.8rem; text-align: center;
+    }
+    .stat-hero .num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; color: var(--dorado); display: block;
+    }
+    .stat-hero .lab { font-size: 0.75rem; color: #D5C8A8; text-transform: uppercase; letter-spacing: 0.1em; }
+
+    /* Countdown */
+    #countdown {
+      background: rgba(139,58,26,0.85); border-radius: 16px;
+      padding: 1.2rem 2rem; display: flex; gap: 1.5rem; align-items: center;
+    }
+    #countdown .count-label { color: #E8DFC8; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .count-blocks { display: flex; gap: 0.75rem; }
+    .count-block { text-align: center; }
+    .count-block .n {
+      font-family: 'Playfair Display', serif; font-size: 2rem;
+      color: #FEFCF5; display: block; line-height: 1;
+    }
+    .count-block .u { font-size: 0.65rem; color: #D5C8A8; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    /* ── SECCIONES GENÉRICAS ── */
+    section { padding: 5rem 1.5rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      color: var(--terracota); margin-bottom: 0.5rem;
+    }
+    .section-line {
+      width: 60px; height: 3px;
+      background: var(--dorado); border-radius: 2px;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── MAPA ── */
+    #mapa { background: var(--crema); }
+    #map { height: 440px; border-radius: 16px; border: 2px solid var(--borde); }
+
+    /* ── ETAPAS ── */
+    #etapas { background: var(--fondo); }
+    .etapas-grid { display: flex; flex-direction: column; gap: 1.5rem; }
+    .etapa-card {
+      background: var(--crema); border-radius: 16px;
+      border: 1.5px solid var(--borde); overflow: hidden;
+      display: grid; grid-template-columns: 90px 1fr;
+      transition: box-shadow 0.2s;
+    }
+    .etapa-card:hover { box-shadow: 0 8px 32px rgba(139,58,26,0.12); }
+    .etapa-num {
+      background: var(--terracota); color: #FEFCF5;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 1.5rem 0.75rem; text-align: center;
+    }
+    .etapa-num .n {
+      font-family: 'Playfair Display', serif; font-size: 2.5rem; line-height: 1;
+    }
+    .etapa-num .label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.8; margin-top: 4px; }
+    .etapa-info { padding: 1.4rem 1.8rem; }
+    .etapa-fecha { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--dorado); font-weight: 700; margin-bottom: 0.3rem; }
+    .etapa-ruta { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--texto); margin-bottom: 0.5rem; }
+    .etapa-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .etapa-meta span {
+      font-size: 0.82rem; color: var(--texto-suave);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .etapa-meta .ico { font-size: 0.9rem; }
+    .etapa-aloj {
+      margin-top: 0.8rem; padding-top: 0.8rem;
+      border-top: 1px solid var(--borde);
+      font-size: 0.85rem; color: var(--texto-suave);
+      display: flex; gap: 0.5rem; align-items: center;
+    }
+    .badge-reservado {
+      display: inline-block; background: #e8f5e9;
+      color: #2e7d32; font-size: 0.65rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 2px 8px; border-radius: 20px; border: 1px solid #a5d6a7;
+    }
+    .badge-atencion {
+      display: inline-block; background: #fff3e0;
+      color: #e65100; font-size: 0.65rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 2px 8px; border-radius: 20px; border: 1px solid #ffcc80;
+    }
+
+    /* ── DÓNDE ESTAMOS ── */
+    #donde { background: var(--verde); }
+    #donde .section-title { color: #FEFCF5; }
+    #donde .section-line { background: var(--dorado); }
+    .donde-intro { color: #C5D9AA; margin-bottom: 2rem; font-size: 1rem; }
+    .tracker {
+      background: rgba(254,252,245,0.08);
+      border: 1.5px solid rgba(254,252,245,0.2);
+      border-radius: 20px; padding: 2rem;
+    }
+    .tracker-status {
+      text-align: center; margin-bottom: 2rem;
+    }
+    .tracker-status .lugar {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; color: var(--dorado); display: block;
+    }
+    .tracker-status .detalle { color: #C5D9AA; font-size: 0.9rem; }
+    .progreso-bar {
+      background: rgba(255,255,255,0.1);
+      border-radius: 50px; height: 10px; margin: 1.5rem 0; position: relative;
+      overflow: hidden;
+    }
+    .progreso-fill {
+      height: 100%; border-radius: 50px;
+      background: linear-gradient(to right, var(--dorado), #E8A83A);
+      transition: width 0.6s ease;
+    }
+    .etapas-dots {
+      display: flex; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;
+    }
+    .dot-etapa {
+      text-align: center; flex: 1; min-width: 70px;
+    }
+    .dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      margin: 0 auto 6px;
+      transition: all 0.3s;
+    }
+    .dot.completada { background: var(--dorado); border-color: var(--dorado); }
+    .dot.actual { background: #FEFCF5; border-color: #FEFCF5; box-shadow: 0 0 0 4px rgba(254,252,245,0.25); }
+    .dot.pendiente { background: transparent; }
+    .dot-etapa .nombre { font-size: 0.62rem; color: rgba(254,252,245,0.6); text-transform: uppercase; letter-spacing: 0.06em; }
+    .dot-etapa.actual-etapa .nombre { color: #FEFCF5; font-weight: 700; }
+
+    /* ── ALOJAMIENTOS ── */
+    #alojamientos { background: var(--crema); }
+    .aloj-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .aloj-card {
+      background: var(--fondo); border-radius: 16px;
+      border: 1.5px solid var(--borde); padding: 1.5rem;
+    }
+    .aloj-noche { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--dorado); font-weight: 700; margin-bottom: 0.3rem; }
+    .aloj-nombre { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.3rem; }
+    .aloj-lugar { font-size: 0.85rem; color: var(--texto-suave); margin-bottom: 1rem; }
+    .aloj-detalles { border-top: 1px solid var(--borde); padding-top: 1rem; }
+    .aloj-row { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 3px 0; }
+    .aloj-row .k { color: var(--texto-suave); }
+    .aloj-row .v { font-weight: 700; color: var(--texto); }
+    .aloj-precio { margin-top: 0.8rem; font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--terracota); text-align: right; }
+
+    /* ── GALERÍA ── */
+    #galeria { background: var(--fondo); }
+    .galeria-placeholder {
+      background: var(--crema); border: 2px dashed var(--borde);
+      border-radius: 16px; padding: 4rem 2rem; text-align: center;
+    }
+    .galeria-placeholder .ico { font-size: 3rem; margin-bottom: 1rem; display: block; }
+    .galeria-placeholder p { color: var(--texto-suave); font-size: 0.95rem; }
+    .galeria-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+    .galeria-item {
+      aspect-ratio: 1; border-radius: 12px; overflow: hidden;
+      background: var(--borde); position: relative;
+    }
+    .galeria-item img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── LOGÍSTICA ── */
+    #logistica { background: var(--crema); }
+    .logistica-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .log-card {
+      background: var(--fondo); border-radius: 16px;
+      border: 1.5px solid var(--borde); padding: 1.5rem;
+    }
+    .log-dia { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--verde-claro); font-weight: 700; margin-bottom: 0.4rem; }
+    .log-titulo { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.8rem; }
+    .log-item { font-size: 0.85rem; color: var(--texto-suave); padding: 4px 0; display: flex; gap: 8px; }
+    .log-item .ico { font-size: 1rem; flex-shrink: 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--texto); color: #D5C8A8;
+      text-align: center; padding: 2.5rem 1.5rem;
+    }
+    footer .footer-title {
+      font-family: 'Playfair Display', serif; color: #FEFCF5; font-size: 1.2rem; margin-bottom: 0.3rem;
+    }
+    footer p { font-size: 0.82rem; opacity: 0.7; }
+    footer .buen-camino { font-family: 'Playfair Display', serif; font-style: italic; color: var(--dorado); font-size: 1.4rem; margin-top: 1rem; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      nav ul { display: none; }
+      .etapa-card { grid-template-columns: 70px 1fr; }
+      .etapa-num .n { font-size: 1.8rem; }
+      #countdown { flex-direction: column; gap: 0.75rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVEGACIÓN -->
+<nav>
+  <div class="logo">🐚 <span>Camino</span> Isra & Eva</div>
+  <ul>
+    <li><a href="#mapa">Mapa</a></li>
+    <li><a href="#etapas">Etapas</a></li>
+    <li><a href="#donde">¿Dónde estamos?</a></li>
+    <li><a href="#alojamientos">Alojamientos</a></li>
+    <li><a href="#galeria">Galería</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-shell">🐚</div>
+  <h1>Camino <em>Isra & Eva</em><br>2026</h1>
+  <p class="subtitulo">Camino Francés · Sarria → Santiago de Compostela</p>
+
+  <div class="stats-hero">
+    <div class="stat-hero">
+      <span class="num">115</span>
+      <span class="lab">Kilómetros</span>
+    </div>
+    <div class="stat-hero">
+      <span class="num">5</span>
+      <span class="lab">Etapas</span>
+    </div>
+    <div class="stat-hero">
+      <span class="num" id="dias-camino">6</span>
+      <span class="lab">Días de aventura</span>
+    </div>
+  </div>
+
+  <div id="countdown">
+    <span class="count-label">El camino empieza en</span>
+    <div class="count-blocks">
+      <div class="count-block"><span class="n" id="cd-dias">–</span><span class="u">días</span></div>
+      <div class="count-block"><span class="n" id="cd-horas">–</span><span class="u">horas</span></div>
+      <div class="count-block"><span class="n" id="cd-min">–</span><span class="u">min</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAPA INTERACTIVO -->
+<section id="mapa">
+  <div class="container">
+    <h2 class="section-title">La ruta</h2>
+    <div class="section-line"></div>
+    <div id="map"></div>
+  </div>
+</section>
+
+<!-- ETAPAS -->
+<section id="etapas">
+  <div class="container">
+    <h2 class="section-title">Las etapas</h2>
+    <div class="section-line"></div>
+    <div class="etapas-grid" id="etapas-container"></div>
+  </div>
+</section>
+
+<!-- DÓNDE ESTAMOS -->
+<section id="donde">
+  <div class="container">
+    <h2 class="section-title">¿Dónde estamos?</h2>
+    <div class="section-line"></div>
+    <p class="donde-intro">La familia puede seguir aquí nuestra posición actualizada cada día 🗺️</p>
+    <div class="tracker">
+      <div class="tracker-status">
+        <span class="lugar" id="tracker-lugar">Esperando el 16 de agosto…</span>
+        <span class="detalle" id="tracker-detalle">El camino empieza pronto</span>
+      </div>
+      <div class="progreso-bar">
+        <div class="progreso-fill" id="progreso-fill" style="width: 0%"></div>
+      </div>
+      <div class="etapas-dots" id="dots-container"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ALOJAMIENTOS -->
+<section id="alojamientos">
+  <div class="container">
+    <h2 class="section-title">Alojamientos</h2>
+    <div class="section-line"></div>
+    <div class="aloj-grid" id="aloj-container"></div>
+  </div>
+</section>
+
+<!-- GALERÍA -->
+<section id="galeria">
+  <div class="container">
+    <h2 class="section-title">Galería del camino</h2>
+    <div class="section-line"></div>
+    <div class="galeria-placeholder" id="galeria-contenido">
+      <span class="ico">📷</span>
+      <p>Aquí irán apareciendo las fotos del camino.<br>Volvemos cargados de recuerdos 🎒</p>
+    </div>
+  </div>
+</section>
+
+<!-- LOGÍSTICA -->
+<section id="logistica">
+  <div class="container">
+    <h2 class="section-title">Logística del viaje</h2>
+    <div class="section-line"></div>
+    <div class="logistica-grid">
+      <div class="log-card">
+        <div class="log-dia">Domingo 16 agosto</div>
+        <div class="log-titulo">Viaje a Esperante (Lugo)</div>
+        <div class="log-item"><span class="ico">🚗</span><span>Celorio → Esperante · ~170 km en coche</span></div>
+        <div class="log-item"><span class="ico">🏠</span><span>Casa de David (primo de Isra) · GRATIS</span></div>
+        <div class="log-item"><span class="ico">🅿️</span><span>Coche aparcado en la finca durante todo el camino</span></div>
+      </div>
+      <div class="log-card">
+        <div class="log-dia">Lunes 17 agosto (mañana)</div>
+        <div class="log-titulo">Traslado a Sarria</div>
+        <div class="log-item"><span class="ico">✅</span><span><strong>Plan A:</strong> David nos lleva a Sarria (~25-30 km)</span></div>
+        <div class="log-item"><span class="ico">🚕</span><span><strong>Plan B:</strong> Taxi peregrinos — Eurotaxi Sarria "Pepe" · 606 98 78 78</span></div>
+        <div class="log-item"><span class="ico">🚕</span><span>Peregrino Taxi (Emilio) · peregrinotaxi.es</span></div>
+        <div class="log-item"><span class="ico">💶</span><span>Precio orientativo: 25-35 €</span></div>
+      </div>
+      <div class="log-card">
+        <div class="log-dia">Viernes 21 / Sábado 22 agosto</div>
+        <div class="log-titulo">Vuelta a casa</div>
+        <div class="log-item"><span class="ico">✅</span><span><strong>Plan A:</strong> David nos recoge en Santiago (confirmar)</span></div>
+        <div class="log-item"><span class="ico">🚆</span><span><strong>Plan B:</strong> Tren Renfe — Santiago → Lugo · ~1h 20min</span></div>
+        <div class="log-item"><span class="ico">🚌</span><span><strong>Plan C:</strong> Bus ALSA — opción más económica</span></div>
+        <div class="log-item"><span class="ico">🏁</span><span>Última etapa: Lugo → Esperante ~15 km</span></div>
+      </div>
+      <div class="log-card">
+        <div class="log-dia">Datos útiles</div>
+        <div class="log-titulo">Contactos & info</div>
+        <div class="log-item"><span class="ico">👤</span><span>Reservas a nombre de Eva Gomez</span></div>
+        <div class="log-item"><span class="ico">💳</span><span>Pago PayPal vinculado a Caixa ···3166</span></div>
+        <div class="log-item"><span class="ico">💰</span><span>Total alojamiento: 329,60 €</span></div>
+        <div class="log-item"><span class="ico">👥</span><span>2 peregrinos · Isra & Eva</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-title">🐚 Camino Isra & Eva 2026</div>
+  <p>Sarria → Santiago de Compostela · 16–22 de agosto de 2026</p>
+  <p class="buen-camino">¡Buen Camino!</p>
+</footer>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ============================================================
+   🎒 ACTUALIZA ESTO CADA DÍA DEL CAMINO
+   Cambia el número de ETAPA_ACTUAL:
+     0  = Aún no hemos empezado
+     1  = Etapa 1: Sarria → Portomarín        (17 ago)
+     2  = Etapa 2: Portomarín → Palas de Rei  (18 ago)
+     3  = Etapa 3: Palas de Rei → Arzúa       (19 ago)
+     4  = Etapa 4: Arzúa → O Pedrouzo         (20 ago)
+     5  = Etapa 5: O Pedrouzo → Santiago      (21 ago)
+     6  = ¡Hemos llegado a Santiago! 🎉
+============================================================ */
+const ETAPA_ACTUAL = 0;
+
+/* ── DATOS ── */
+const ETAPAS = [
+  {
+    num: 1,
+    fecha: 'Lun 17 agosto',
+    origen: 'Sarria',
+    destino: 'Portomarín',
+    km: 22.4,
+    horas: '~6h',
+    alojamiento: 'Pensión Portomiño',
+    bano: 'privado',
+    checkin: '14:00–19:00',
+    checkout: '07:00–10:30',
+    precio: '70,00 €',
+    latD: 42.8088, lngD: -7.6161
+  },
+  {
+    num: 2,
+    fecha: 'Mar 18 agosto',
+    origen: 'Portomarín',
+    destino: 'Palas de Rei',
+    km: 24.6,
+    horas: '~6.5h',
+    alojamiento: 'Acubillo',
+    bano: 'privado',
+    checkin: '14:00–00:00',
+    checkout: '06:00–10:00',
+    precio: '65,00 €',
+    latD: 42.8728, lngD: -7.8692
+  },
+  {
+    num: 3,
+    fecha: 'Mié 19 agosto',
+    origen: 'Palas de Rei',
+    destino: 'Arzúa',
+    km: 29.1,
+    horas: '~7.5h',
+    alojamiento: 'Pensión Carballeira',
+    bano: 'privado',
+    checkin: '12:00–20:00',
+    checkout: '06:00–09:30',
+    precio: '55,00 €',
+    latD: 42.9278, lngD: -8.1606
+  },
+  {
+    num: 4,
+    fecha: 'Jue 20 agosto',
+    origen: 'Arzúa',
+    destino: 'O Pedrouzo',
+    km: 19.3,
+    horas: '~5h',
+    alojamiento: 'Pensión Pedrouzo',
+    bano: 'compartido',
+    checkin: '12:30–18:00',
+    checkout: '06:00–10:30',
+    precio: '66,30 €',
+    latD: 42.9100, lngD: -8.3633
+  },
+  {
+    num: 5,
+    fecha: 'Vie 21 agosto',
+    origen: 'O Pedrouzo',
+    destino: 'Santiago de Compostela',
+    km: 20.0,
+    horas: '~5h',
+    alojamiento: 'Ecorooms SCQ Estación',
+    bano: 'privado',
+    checkin: '15:00–23:00',
+    checkout: '08:00–12:00',
+    precio: '73,30 €',
+    nota: 'Opcional — cancelar antes del 19 ago si no os quedáis',
+    latD: 42.8782, lngD: -8.5448
+  }
+];
+
+const PUNTOS = [
+  { nombre: 'Sarria (inicio)', lat: 42.7794, lng: -7.4149, icono: '🚶' },
+  { nombre: 'Portomarín',      lat: 42.8088, lng: -7.6161, icono: '🏠' },
+  { nombre: 'Palas de Rei',    lat: 42.8728, lng: -7.8692, icono: '🏠' },
+  { nombre: 'Arzúa',           lat: 42.9278, lng: -8.1606, icono: '🏠' },
+  { nombre: 'O Pedrouzo',      lat: 42.9100, lng: -8.3633, icono: '🏠' },
+  { nombre: 'Santiago ✨',     lat: 42.8782, lng: -8.5448, icono: '🎉' },
+];
+
+/* ── MAPA ── */
+const map = L.map('map').setView([42.88, -8.0], 9);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+const coordsRuta = PUNTOS.map(p => [p.lat, p.lng]);
+L.polyline(coordsRuta, { color: '#8B3A1A', weight: 4, opacity: 0.85, dashArray: '8,4' }).addTo(map);
+
+PUNTOS.forEach((p, i) => {
+  const isStart = i === 0, isEnd = i === PUNTOS.length - 1;
+  const color = isEnd ? '#C4872A' : isStart ? '#2D5016' : '#8B3A1A';
+  const marker = L.circleMarker([p.lat, p.lng], {
+    radius: isStart || isEnd ? 10 : 8,
+    fillColor: color, color: '#fff', weight: 2, fillOpacity: 1
+  }).addTo(map);
+  marker.bindPopup(`<strong>${p.nombre}</strong>${i > 0 && i < PUNTOS.length ? `<br><small>Etapa ${i}</small>` : ''}`);
+});
+
+/* ── ETAPAS (render) ── */
+const etapasContainer = document.getElementById('etapas-container');
+ETAPAS.forEach(e => {
+  const badgeBano = e.bano === 'compartido'
+    ? '<span class="badge-atencion">⚠ Baño compartido</span>'
+    : '<span class="badge-reservado">✓ Baño privado</span>';
+  const notaHtml = e.nota ? `<div style="margin-top:6px;font-size:0.78rem;color:#e65100;">⚠ ${e.nota}</div>` : '';
+  etapasContainer.innerHTML += `
+    <div class="etapa-card">
+      <div class="etapa-num">
+        <span class="n">${e.num}</span>
+        <span class="label">Etapa</span>
+      </div>
+      <div class="etapa-info">
+        <div class="etapa-fecha">${e.fecha}</div>
+        <div class="etapa-ruta">${e.origen} → ${e.destino}</div>
+        <div class="etapa-meta">
+          <span><span class="ico">📍</span> ${e.km} km</span>
+          <span><span class="ico">⏱️</span> ${e.horas}</span>
+          <span><span class="ico">🏠</span> ${e.alojamiento}</span>
+        </div>
+        <div class="etapa-aloj">
+          ${badgeBano} Check-in: ${e.checkin} · Check-out: ${e.checkout}
+          ${notaHtml}
+        </div>
+      </div>
+    </div>`;
+});
+
+/* ── ALOJAMIENTOS (render) ── */
+const alojContainer = document.getElementById('aloj-container');
+ETAPAS.forEach(e => {
+  const alertaBano = e.bano === 'compartido' ? '<div style="margin-top:6px;font-size:0.78rem;color:#e65100;">⚠ Baño compartido</div>' : '';
+  const alertaNota = e.nota ? `<div style="margin-top:6px;font-size:0.78rem;color:#e65100;">⚠ ${e.nota}</div>` : '';
+  alojContainer.innerHTML += `
+    <div class="aloj-card">
+      <div class="aloj-noche">Noche del ${e.fecha.split(' ').slice(1).join(' ')}</div>
+      <div class="aloj-nombre">${e.alojamiento}</div>
+      <div class="aloj-lugar">${e.destino}</div>
+      <div class="aloj-detalles">
+        <div class="aloj-row"><span class="k">Check-in</span><span class="v">${e.checkin}</span></div>
+        <div class="aloj-row"><span class="k">Check-out</span><span class="v">${e.checkout}</span></div>
+        <div class="aloj-row"><span class="k">Baño</span><span class="v">${e.bano}</span></div>
+        ${alertaBano}${alertaNota}
+      </div>
+      <div class="aloj-precio">${e.precio}</div>
+    </div>`;
+});
+
+/* ── TRACKER ¿DÓNDE ESTAMOS? ── */
+const estados = [
+  { lugar: '¡El camino empieza el 16 de agosto!',   detalle: 'Preparando las mochilas 🎒', pct: 0 },
+  { lugar: 'En camino: Sarria → Portomarín',         detalle: 'Etapa 1 · 22.4 km · Lunes 17 ago', pct: 16 },
+  { lugar: 'En camino: Portomarín → Palas de Rei',   detalle: 'Etapa 2 · 24.6 km · Martes 18 ago', pct: 36 },
+  { lugar: 'En camino: Palas de Rei → Arzúa',        detalle: 'Etapa 3 · 29.1 km · Miércoles 19 ago', pct: 59 },
+  { lugar: 'En camino: Arzúa → O Pedrouzo',          detalle: 'Etapa 4 · 19.3 km · Jueves 20 ago', pct: 79 },
+  { lugar: 'En camino: O Pedrouzo → Santiago',       detalle: 'Etapa 5 · 20 km · ¡Última etapa! 🐚', pct: 95 },
+  { lugar: '¡¡Hemos llegado a Santiago!! 🎉',        detalle: '115 km recorridos · ¡Ultreia!', pct: 100 },
+];
+
+const estado = estados[Math.min(ETAPA_ACTUAL, 6)];
+document.getElementById('tracker-lugar').textContent = estado.lugar;
+document.getElementById('tracker-detalle').textContent = estado.detalle;
+document.getElementById('progreso-fill').style.width = estado.pct + '%';
+
+const dotsContainer = document.getElementById('dots-container');
+const nombresDots = ['Sarria', 'Portomarín', 'Palas de Rei', 'Arzúa', 'O Pedrouzo', 'Santiago'];
+nombresDots.forEach((n, i) => {
+  const etapaIdx = i + 1;
+  let clsDot = 'pendiente';
+  if (ETAPA_ACTUAL >= 6 || i < ETAPA_ACTUAL) clsDot = 'completada';
+  else if (i === ETAPA_ACTUAL - 1 || (ETAPA_ACTUAL === 0 && i === 0) || (ETAPA_ACTUAL === 6 && i === 5)) clsDot = 'actual';
+  const clsEtapa = (i === ETAPA_ACTUAL - 1 || (ETAPA_ACTUAL === 6 && i === 5)) ? 'actual-etapa' : '';
+  dotsContainer.innerHTML += `
+    <div class="dot-etapa ${clsEtapa}">
+      <div class="dot ${clsDot}"></div>
+      <div class="nombre">${n}</div>
+    </div>`;
+});
+
+/* ── COUNTDOWN ── */
+function updateCountdown() {
+  const target = new Date('2026-08-16T08:00:00');
+  const now = new Date();
+  const diff = target - now;
+  if (diff <= 0) {
+    document.getElementById('countdown').innerHTML = '<span style="color:#F7F3E9;font-family:Playfair Display,serif;font-style:italic;font-size:1.2rem">¡El Camino ha comenzado! 🎉</span>';
+    return;
+  }
+  const dias  = Math.floor(diff / 86400000);
+  const horas = Math.floor((diff % 86400000) / 3600000);
+  const mins  = Math.floor((diff % 3600000) / 60000);
+  document.getElementById('cd-dias').textContent  = dias;
+  document.getElementById('cd-horas').textContent = horas;
+  document.getElementById('cd-min').textContent   = mins;
+}
+updateCountdown();
+setInterval(updateCountdown, 30000);
+</script>
+</body>
+</html>
