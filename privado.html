@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zona Privada · Isra & Eva 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --noche:    #0F2233;
+      --marino:   #1B4D6E;
+      --atlantico:#3A7CA5;
+      --bruma:    #88BDD8;
+      --cielo:    #E8F4F8;
+      --concha:   #F5C842;
+      --fondo:    #F4F8FB;
+      --blanco:   #FFFFFF;
+      --texto:    #0F2233;
+      --texto-s:  #4A6880;
+      --borde:    #C8DFF0;
+      --alerta:   #E05C5C;
+      --ok:       #3DAA6B;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--fondo); color: var(--texto); line-height: 1.7; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem; height: 64px;
+      background: rgba(15,34,51,0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(136,189,216,0.15);
+    }
+    .nav-logo { font-family:'Cormorant Garamond',serif; font-size:1.15rem; font-style:italic; color:var(--blanco); text-decoration:none; }
+    .nav-logo strong { color:var(--concha); font-style:normal; font-weight:600; }
+    .nav-links { display:flex; gap:0.25rem; list-style:none; }
+    .nav-links a { color:rgba(232,244,248,0.7); text-decoration:none; font-size:0.82rem; font-weight:400; letter-spacing:0.07em; text-transform:uppercase; padding:0.4rem 0.9rem; border-radius:6px; transition:color 0.2s,background 0.2s; }
+    .nav-links a:hover { color:var(--blanco); background:rgba(255,255,255,0.07); }
+    .nav-links a.active { color:var(--concha); }
+    .nav-pill { background:var(--concha); color:var(--noche); font-size:0.78rem; font-weight:500; padding:0.35rem 1rem; border-radius:20px; text-decoration:none; letter-spacing:0.04em; transition:opacity 0.2s; }
+    .nav-pill:hover { opacity:0.85; }
+
+    /* ── LOCK SCREEN ── */
+    #lock-screen {
+      position: fixed; inset: 0; z-index: 200;
+      background:
+        linear-gradient(160deg, rgba(15,34,51,0.97) 0%, rgba(27,77,110,0.95) 100%),
+        url('https://images.unsplash.com/photo-1599930113854-d6d7fd521f10?w=1600&q=80') center/cover no-repeat;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    .lock-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(136,189,216,0.25);
+      border-radius: 24px;
+      padding: 3rem 3rem 2.5rem;
+      width: 100%; max-width: 420px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+    }
+    .lock-icon {
+      width: 64px; height: 64px;
+      background: rgba(245,200,66,0.12);
+      border: 1.5px solid rgba(245,200,66,0.4);
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin-bottom: 1.5rem;
+    }
+    .lock-title { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:600; color:var(--blanco); margin-bottom:0.4rem; }
+    .lock-title em { font-style:italic; color:var(--concha); }
+    .lock-sub { font-size:0.85rem; color:rgba(136,189,216,0.7); margin-bottom:2rem; line-height:1.5; }
+    .lock-form { display:flex; flex-direction:column; gap:1rem; }
+    .lock-input-wrap { position:relative; }
+    .lock-input {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(136,189,216,0.3);
+      border-radius: 10px;
+      padding: 0.85rem 3rem 0.85rem 1.1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--blanco);
+      outline: none;
+      letter-spacing: 0.1em;
+      transition: border-color 0.2s;
+    }
+    .lock-input::placeholder { color: rgba(136,189,216,0.4); letter-spacing:0.05em; }
+    .lock-input:focus { border-color: rgba(245,200,66,0.6); }
+    .lock-input.error { border-color: var(--alerta); animation: shake 0.35s ease; }
+    .toggle-pass {
+      position: absolute; right:0.85rem; top:50%; transform:translateY(-50%);
+      background:none; border:none; cursor:pointer; color:rgba(136,189,216,0.5);
+      font-size:1rem; padding:0; transition:color 0.2s;
+    }
+    .toggle-pass:hover { color:var(--bruma); }
+    .lock-btn {
+      background: var(--concha); color: var(--noche);
+      border: none; border-radius: 10px;
+      padding: 0.9rem; font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:500;
+      cursor:pointer; transition:opacity 0.2s, transform 0.1s;
+      letter-spacing:0.04em;
+    }
+    .lock-btn:hover { opacity:0.88; }
+    .lock-btn:active { transform:scale(0.98); }
+    .lock-error {
+      font-size:0.8rem; color:var(--alerta);
+      background:rgba(224,92,92,0.1); border:1px solid rgba(224,92,92,0.25);
+      border-radius:8px; padding:0.5rem 0.75rem;
+      display:none;
+    }
+    .lock-error.visible { display:block; }
+    .lock-hint { margin-top:1.5rem; font-size:0.72rem; color:rgba(136,189,216,0.35); }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+    }
+
+    /* ── CONTENIDO PRIVADO ── */
+    #private-content { display:none; padding-top:64px; }
+
+    /* Page header */
+    .page-header {
+      background: linear-gradient(135deg, var(--noche) 0%, var(--marino) 100%);
+      padding: 4rem 1.5rem 3.5rem;
+      text-align: center;
+    }
+    .page-header-eyebrow {
+      display:inline-flex; align-items:center; gap:8px;
+      background:rgba(245,200,66,0.15); border:1px solid rgba(245,200,66,0.35); border-radius:20px;
+      color:var(--concha); font-size:0.72rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase;
+      padding:0.3rem 0.9rem; margin-bottom:1rem;
+    }
+    .page-header h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,5vw,3.2rem); font-weight:600; color:var(--blanco); margin-bottom:0.5rem; }
+    .page-header h1 em { font-style:italic; color:var(--concha); }
+    .page-header p { color:rgba(136,189,216,0.7); font-size:0.9rem; }
+    .logout-btn {
+      display:inline-flex; align-items:center; gap:6px;
+      margin-top:1.5rem; padding:0.45rem 1.1rem;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(136,189,216,0.25);
+      border-radius:20px; color:rgba(136,189,216,0.7); font-size:0.78rem;
+      text-decoration:none; cursor:pointer; transition:all 0.2s;
+    }
+    .logout-btn:hover { background:rgba(255,255,255,0.13); color:var(--blanco); }
+
+    /* Sections */
+    section.private { padding:4.5rem 1.5rem; }
+    section.private.alt { background:var(--blanco); }
+    .container { max-width:1060px; margin:0 auto; }
+    .section-label { display:inline-block; font-size:0.7rem; font-weight:500; text-transform:uppercase; letter-spacing:0.15em; color:var(--atlantico); margin-bottom:0.6rem; }
+    .section-title { font-family:'Cormorant Garamond',serif; font-size:clamp(1.7rem,4vw,2.4rem); font-weight:600; color:var(--noche); line-height:1.1; margin-bottom:0.5rem; }
+    .section-title em { font-style:italic; color:var(--atlantico); }
+    .divider-line { width:44px; height:2px; background:var(--concha); border-radius:2px; margin-bottom:2.5rem; }
+
+    /* ── ALOJAMIENTOS ── */
+    .aloj-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:1.25rem; }
+    .aloj-card {
+      background:var(--blanco);
+      border:1px solid var(--borde);
+      border-radius:16px;
+      overflow:hidden;
+      transition:box-shadow 0.2s;
+    }
+    section.alt .aloj-card { background:var(--fondo); }
+    .aloj-card:hover { box-shadow:0 8px 32px rgba(27,77,110,0.1); }
+    .aloj-card-head {
+      background:var(--noche);
+      padding:1rem 1.25rem 0.9rem;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:0.5rem;
+    }
+    .aloj-etapa-badge {
+      background:rgba(245,200,66,0.15); border:1px solid rgba(245,200,66,0.35);
+      color:var(--concha); font-size:0.65rem; font-weight:500;
+      letter-spacing:0.1em; text-transform:uppercase;
+      padding:0.2rem 0.6rem; border-radius:20px;
+      white-space:nowrap;
+    }
+    .aloj-precio {
+      font-family:'Cormorant Garamond',serif;
+      font-size:1.5rem; font-weight:600; color:var(--blanco); line-height:1;
+    }
+    .aloj-precio small { font-family:'DM Sans',sans-serif; font-size:0.68rem; color:rgba(136,189,216,0.6); font-weight:400; display:block; text-align:right; margin-top:2px; }
+    .aloj-body { padding:1.1rem 1.25rem 1.25rem; }
+    .aloj-nombre {
+      font-family:'Cormorant Garamond',serif;
+      font-size:1.25rem; font-weight:600; color:var(--noche);
+      margin-bottom:0.2rem;
+    }
+    .aloj-lugar { font-size:0.78rem; color:var(--atlantico); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:1rem; }
+    .aloj-rows { display:flex; flex-direction:column; gap:0.5rem; }
+    .aloj-row { display:flex; align-items:center; gap:0.6rem; }
+    .aloj-row-icon { font-size:0.9rem; flex-shrink:0; width:18px; text-align:center; }
+    .aloj-row-txt { font-size:0.82rem; color:var(--texto-s); }
+    .aloj-row-txt strong { color:var(--texto); font-weight:500; }
+    .aloj-badge-warn {
+      display:inline-flex; align-items:center; gap:5px;
+      background:rgba(224,92,92,0.08); border:1px solid rgba(224,92,92,0.25);
+      color:var(--alerta); font-size:0.75rem; padding:0.3rem 0.7rem;
+      border-radius:6px; margin-top:0.75rem;
+    }
+    .aloj-badge-ok {
+      display:inline-flex; align-items:center; gap:5px;
+      background:rgba(61,170,107,0.08); border:1px solid rgba(61,170,107,0.2);
+      color:var(--ok); font-size:0.75rem; padding:0.3rem 0.7rem;
+      border-radius:6px; margin-top:0.75rem;
+    }
+    .aloj-cancelacion {
+      margin-top:0.75rem; padding:0.65rem 0.75rem;
+      background:rgba(224,92,92,0.06); border-left:3px solid var(--alerta);
+      border-radius:0 6px 6px 0;
+      font-size:0.78rem; color:var(--alerta); line-height:1.4;
+    }
+
+    /* ── TOTAL ── */
+    .total-row {
+      display:flex; align-items:center; justify-content:space-between;
+      background:var(--noche); border-radius:14px; padding:1.25rem 1.75rem;
+      margin-top:2rem;
+    }
+    .total-label { font-size:0.8rem; color:var(--bruma); text-transform:uppercase; letter-spacing:0.1em; }
+    .total-val { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:600; color:var(--concha); }
+    .total-meta { font-size:0.78rem; color:rgba(136,189,216,0.6); margin-top:3px; }
+    .total-nota {
+      margin-top:0.75rem; font-size:0.8rem; color:var(--texto-s);
+      background:var(--cielo); border:1px solid var(--borde); border-radius:10px;
+      padding:0.75rem 1rem; line-height:1.5;
+    }
+    .total-nota strong { color:var(--marino); }
+
+    /* ── LOGÍSTICA ── */
+    .logistica-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .log-card {
+      background:var(--blanco); border:1px solid var(--borde); border-radius:16px;
+      padding:1.5rem 1.75rem;
+    }
+    section.alt .log-card { background:var(--fondo); }
+    .log-day-badge {
+      display:inline-flex; align-items:center; gap:7px;
+      background:var(--marino); color:var(--blanco);
+      font-size:0.7rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase;
+      padding:0.3rem 0.8rem; border-radius:20px; margin-bottom:1rem;
+    }
+    .log-day-badge .dot { width:6px; height:6px; border-radius:50%; background:var(--concha); }
+    .log-card h3 { font-family:'Cormorant Garamond',serif; font-size:1.35rem; font-weight:600; color:var(--noche); margin-bottom:0.85rem; }
+    .log-items { display:flex; flex-direction:column; gap:0.65rem; }
+    .log-item { display:flex; align-items:flex-start; gap:0.7rem; }
+    .log-item-icon { flex-shrink:0; font-size:0.9rem; margin-top:2px; width:20px; text-align:center; }
+    .log-item-txt { font-size:0.85rem; color:var(--texto-s); line-height:1.5; }
+    .log-item-txt strong { color:var(--texto); font-weight:500; }
+    .log-item-txt .plan-b { color:var(--atlantico); }
+    .log-item-txt .plan-c { color:var(--texto-s); }
+    .log-divider { height:1px; background:var(--borde); margin:0.75rem 0; }
+    .log-highlight {
+      background:rgba(245,200,66,0.08); border:1px solid rgba(245,200,66,0.3);
+      border-radius:10px; padding:0.75rem 1rem;
+      font-size:0.82rem; color:var(--noche); line-height:1.5; margin-top:0.75rem;
+    }
+    .log-highlight strong { color:var(--marino); }
+    .log-warn {
+      background:rgba(224,92,92,0.06); border:1px solid rgba(224,92,92,0.2);
+      border-radius:10px; padding:0.75rem 1rem;
+      font-size:0.82rem; color:var(--alerta); line-height:1.5; margin-top:0.75rem;
+    }
+
+    /* ── SUMMARY TABLE ── */
+    .resumen-table { width:100%; border-collapse:collapse; margin-top:0.5rem; }
+    .resumen-table th {
+      text-align:left; font-size:0.68rem; font-weight:500; text-transform:uppercase;
+      letter-spacing:0.1em; color:var(--texto-s); padding:0 1rem 0.6rem;
+      border-bottom:1px solid var(--borde);
+    }
+    .resumen-table td {
+      padding:0.75rem 1rem; font-size:0.85rem; color:var(--texto-s);
+      border-bottom:1px solid rgba(200,223,240,0.5);
+    }
+    .resumen-table td:first-child { color:var(--texto); font-weight:500; }
+    .resumen-table tr:last-child td { border-bottom:none; }
+    .resumen-table .highlight-row td { background:rgba(245,200,66,0.05); color:var(--alerta); font-weight:500; }
+    .resumen-table .highlight-row td:first-child { color:var(--alerta); }
+    .badge-warn-sm { font-size:0.7rem; background:rgba(224,92,92,0.1); color:var(--alerta); padding:0.15rem 0.5rem; border-radius:4px; margin-left:4px; }
+
+    /* FOOTER */
+    footer { background:var(--noche); border-top:1px solid rgba(136,189,216,0.1); padding:3rem 1.5rem; text-align:center; }
+    .footer-logo { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-style:italic; color:var(--blanco); margin-bottom:0.5rem; }
+    .footer-logo span { color:var(--concha); }
+    footer p { font-size:0.8rem; color:rgba(136,189,216,0.5); }
+    .ultreia { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.1rem; color:var(--concha); margin-top:1rem; }
+
+    /* RESPONSIVE */
+    @media (max-width:768px) {
+      nav { padding:0 1.25rem; }
+      .nav-links { display:none; }
+      .lock-card { padding:2.25rem 1.75rem 2rem; }
+      .logistica-grid { grid-template-columns:1fr; }
+      .aloj-grid { grid-template-columns:1fr; }
+      .total-row { flex-direction:column; align-items:flex-start; gap:0.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo"><strong>Isra & Eva</strong> · Nuestro Camino 2026</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="ruta.html">La ruta</a></li>
+    <li><a href="diario.html">Diario</a></li>
+  </ul>
+  <a href="privado.html" class="nav-pill active">🔒 Zona privada</a>
+</nav>
+
+<!-- ══════════════════════════════════
+     PANTALLA DE CONTRASEÑA
+══════════════════════════════════ -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-icon">🔒</div>
+    <h2 class="lock-title">Zona <em>privada</em></h2>
+    <p class="lock-sub">Acceso solo para Isra & Eva.<br>Alojamientos, horarios y logística del camino.</p>
+    <div class="lock-form">
+      <div class="lock-input-wrap">
+        <input type="password" id="pass-input" class="lock-input" placeholder="Contraseña" autocomplete="current-password" autocapitalize="none">
+        <button class="toggle-pass" id="toggle-pass" type="button" aria-label="Mostrar contraseña">👁</button>
+      </div>
+      <div class="lock-error" id="lock-error">Contraseña incorrecta. Inténtalo de nuevo.</div>
+      <button class="lock-btn" id="unlock-btn">Entrar →</button>
+    </div>
+    <p class="lock-hint">¿Olvidaste la clave? Pregunta a Eva o Isra.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     CONTENIDO PRIVADO
+══════════════════════════════════ -->
+<div id="private-content">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="page-header-eyebrow">🔒 Zona privada · Solo Isra & Eva</div>
+    <h1>Info <em>privada</em> del camino</h1>
+    <p>Alojamientos · Horarios · Logística · Cancelaciones</p>
+    <button class="logout-btn" onclick="lockAgain()">🔒 Cerrar sesión</button>
+  </div>
+
+  <!-- ── ALOJAMIENTOS ── -->
+  <section class="private alt" id="alojamientos">
+    <div class="container">
+      <span class="section-label">Dónde dormimos</span>
+      <h2 class="section-title">Alojamientos <em>por etapa</em></h2>
+      <div class="divider-line"></div>
+
+      <div class="aloj-grid">
+
+        <!-- Etapa 1 -->
+        <div class="aloj-card">
+          <div class="aloj-card-head">
+            <div>
+              <div class="aloj-etapa-badge">Etapa 1 · Lun 17 ago</div>
+            </div>
+            <div style="text-align:right">
+              <div class="aloj-precio">70 €<small>/ noche</small></div>
+            </div>
+          </div>
+          <div class="aloj-body">
+            <div class="aloj-nombre">Pensión Portomiño</div>
+            <div class="aloj-lugar">📍 Portomarín</div>
+            <div class="aloj-rows">
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🚪</span>
+                <span class="aloj-row-txt"><strong>Check-in:</strong> 14:00 – 19:00</span>
+              </div>
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🌅</span>
+                <span class="aloj-row-txt"><strong>Check-out:</strong> 07:00 – 10:30</span>
+              </div>
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🚿</span>
+                <span class="aloj-row-txt"><strong>Baño:</strong> Privado ✓</span>
+              </div>
+            </div>
+            <span class="aloj-badge-ok">✓ Baño privado</span>
+          </div>
+        </div>
+
+        <!-- Etapa 2 -->
+        <div class="aloj-card">
+          <div class="aloj-card-head">
+            <div>
+              <div class="aloj-etapa-badge">Etapa 2 · Mar 18 ago</div>
+            </div>
+            <div style="text-align:right">
+              <div class="aloj-precio">65 €<small>/ noche</small></div>
+            </div>
+          </div>
+          <div class="aloj-body">
+            <div class="aloj-nombre">Acubillo</div>
+            <div class="aloj-lugar">📍 Palas de Rei</div>
+            <div class="aloj-rows">
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🚪</span>
+                <span class="aloj-row-txt"><strong>Check-in:</strong> 14:00 – 00:00</span>
+              </div>
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🌅</span>
+                <span class="aloj-row-txt"><strong>Check-out:</strong> 06:00 – 10:00</span>
+              </div>
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🚿</span>
+                <span class="aloj-row-txt"><strong>Baño:</strong> Privado ✓</span>
+              </div>
+            </div>
+            <span class="aloj-badge-ok">✓ Baño privado</span>
+          </div>
+        </div>
+
+        <!-- Etapa 3 -->
+        <div class="aloj-card">
+          <div class="aloj-card-head">
+            <div>
+              <div class="aloj-etapa-badge">Etapa 3 · Mié 19 ago</div>
+            </div>
+            <div style="text-align:right">
+              <div class="aloj-precio">55 €<small>/ noche</small></div>
+            </div>
+          </div>
+          <div class="aloj-body">
+            <div class="aloj-nombre">Pensión Carballeira</div>
+            <div class="aloj-lugar">📍 Arzúa</div>
+            <div class="aloj-rows">
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🚪</span>
+                <span class="aloj-row-txt"><strong>Check-in:</strong> 12:00 – 20:00</span>
+              </div>
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🌅</span>
+                <span class="aloj-row-txt"><strong>Check-out:</strong> 06:00 – 09:30</span>
+              </div>
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🚿</span>
+                <span class="aloj-row-txt"><strong>Baño:</strong> Privado ✓</span>
+              </div>
+            </div>
+            <span class="aloj-badge-ok">✓ Baño privado</span>
+          </div>
+        </div>
+
+        <!-- Etapa 4 -->
+        <div class="aloj-card">
+          <div class="aloj-card-head">
+            <div>
+              <div class="aloj-etapa-badge">Etapa 4 · Jue 20 ago</div>
+            </div>
+            <div style="text-align:right">
+              <div class="aloj-precio">66,30 €<small>/ noche</small></div>
+            </div>
+          </div>
+          <div class="aloj-body">
+            <div class="aloj-nombre">Pensión Pedrouzo</div>
+            <div class="aloj-lugar">📍 O Pedrouzo</div>
+            <div class="aloj-rows">
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🚪</span>
+                <span class="aloj-row-txt"><strong>Check-in:</strong> 12:30 – 18:00</span>
+              </div>
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🌅</span>
+                <span class="aloj-row-txt"><strong>Check-out:</strong> 06:00 – 10:30</span>
+              </div>
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🚿</span>
+                <span class="aloj-row-txt"><strong>Baño:</strong> Compartido ⚠️</span>
+              </div>
+            </div>
+            <span class="aloj-badge-warn">⚠️ Baño compartido en esta etapa</span>
+          </div>
+        </div>
+
+        <!-- Etapa 5 -->
+        <div class="aloj-card">
+          <div class="aloj-card-head">
+            <div>
+              <div class="aloj-etapa-badge">Etapa 5 · Vie 21 ago</div>
+            </div>
+            <div style="text-align:right">
+              <div class="aloj-precio">73,30 €<small>/ noche</small></div>
+            </div>
+          </div>
+          <div class="aloj-body">
+            <div class="aloj-nombre">Ecorooms SCQ Estación</div>
+            <div class="aloj-lugar">📍 Santiago de Compostela</div>
+            <div class="aloj-rows">
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🚪</span>
+                <span class="aloj-row-txt"><strong>Check-in:</strong> 15:00 – 23:00</span>
+              </div>
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🌅</span>
+                <span class="aloj-row-txt"><strong>Check-out:</strong> 08:00 – 12:00</span>
+              </div>
+              <div class="aloj-row">
+                <span class="aloj-row-icon">🚿</span>
+                <span class="aloj-row-txt"><strong>Baño:</strong> Privado ✓</span>
+              </div>
+            </div>
+            <span class="aloj-badge-ok">✓ Baño privado</span>
+            <div class="aloj-cancelacion">
+              ⚠️ <strong>Reserva opcional.</strong> Cancelar antes del <strong>19 de agosto</strong> si no se necesita.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Total + nota de pago -->
+      <div class="total-row">
+        <div>
+          <div class="total-label">Total alojamiento (5 noches)</div>
+          <div class="total-meta">Reservas a nombre de Eva Gomez · Pago PayPal Caixa ···3166</div>
+        </div>
+        <div class="total-val">329,60 €</div>
+      </div>
+      <div class="total-nota">
+        <strong>Nota de pago:</strong> Todas las reservas están a nombre de <strong>Eva Gomez</strong> y pagadas con <strong>PayPal Caixa ···3166</strong>. Confirmar en cada alojamiento al llegar.
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── RESUMEN RÁPIDO ── -->
+  <section class="private" id="resumen">
+    <div class="container">
+      <span class="section-label">Resumen</span>
+      <h2 class="section-title">Vista rápida de <em>horarios</em></h2>
+      <div class="divider-line"></div>
+      <div style="overflow-x:auto; border:1px solid var(--borde); border-radius:14px;">
+        <table class="resumen-table">
+          <thead>
+            <tr>
+              <th>Noche</th>
+              <th>Alojamiento</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Precio</th>
+              <th>Baño</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Lun 17 ago</td>
+              <td>Pensión Portomiño · <span style="color:var(--texto-s);font-size:0.8rem">Portomarín</span></td>
+              <td>14:00–19:00</td>
+              <td>07:00–10:30</td>
+              <td>70 €</td>
+              <td>Privado ✓</td>
+            </tr>
+            <tr>
+              <td>Mar 18 ago</td>
+              <td>Acubillo · <span style="color:var(--texto-s);font-size:0.8rem">Palas de Rei</span></td>
+              <td>14:00–00:00</td>
+              <td>06:00–10:00</td>
+              <td>65 €</td>
+              <td>Privado ✓</td>
+            </tr>
+            <tr>
+              <td>Mié 19 ago</td>
+              <td>Pensión Carballeira · <span style="color:var(--texto-s);font-size:0.8rem">Arzúa</span></td>
+              <td>12:00–20:00</td>
+              <td>06:00–09:30</td>
+              <td>55 €</td>
+              <td>Privado ✓</td>
+            </tr>
+            <tr class="highlight-row">
+              <td>Jue 20 ago</td>
+              <td>Pensión Pedrouzo · <span style="font-size:0.8rem">O Pedrouzo</span></td>
+              <td>12:30–18:00</td>
+              <td>06:00–10:30</td>
+              <td>66,30 €</td>
+              <td>Compartido ⚠️</td>
+            </tr>
+            <tr>
+              <td>Vie 21 ago</td>
+              <td>Ecorooms SCQ · <span style="color:var(--texto-s);font-size:0.8rem">Santiago</span></td>
+              <td>15:00–23:00</td>
+              <td>08:00–12:00</td>
+              <td>73,30 €<span class="badge-warn-sm">opcional</span></td>
+              <td>Privado ✓</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LOGÍSTICA ── -->
+  <section class="private alt" id="logistica">
+    <div class="container">
+      <span class="section-label">Desplazamientos</span>
+      <h2 class="section-title"><em>Logística</em> de viaje</h2>
+      <div class="divider-line"></div>
+
+      <div class="logistica-grid">
+
+        <!-- Día 0: viaje a Lugo -->
+        <div class="log-card">
+          <div class="log-day-badge"><span class="dot"></span>Dom 16 agosto · Día 0</div>
+          <h3>Viaje a Esperante (Lugo)</h3>
+          <div class="log-items">
+            <div class="log-item">
+              <span class="log-item-icon">🚗</span>
+              <div class="log-item-txt"><strong>Ruta:</strong> Celorio → Esperante (Lugo)<br>~170 km en coche</div>
+            </div>
+            <div class="log-item">
+              <span class="log-item-icon">🏠</span>
+              <div class="log-item-txt"><strong>Alojamiento:</strong> Casa de David<br>(primo de Isra · <span style="color:var(--ok)">gratis</span>)</div>
+            </div>
+            <div class="log-item">
+              <span class="log-item-icon">🅿️</span>
+              <div class="log-item-txt"><strong>Coche:</strong> Se queda aparcado en Esperante toda la semana del camino</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Día 1: traslado a Sarria -->
+        <div class="log-card">
+          <div class="log-day-badge"><span class="dot"></span>Lun 17 agosto · Día 1</div>
+          <h3>Traslado a Sarria</h3>
+          <div class="log-items">
+            <div class="log-item">
+              <span class="log-item-icon">📍</span>
+              <div class="log-item-txt"><strong>Distancia:</strong> Esperante → Sarria (~25–30 km)</div>
+            </div>
+            <div class="log-divider"></div>
+            <div class="log-item">
+              <span class="log-item-icon">🥇</span>
+              <div class="log-item-txt">
+                <strong>Plan A</strong> — David nos lleva a Sarria
+              </div>
+            </div>
+            <div class="log-item">
+              <span class="log-item-icon">🥈</span>
+              <div class="log-item-txt">
+                <span class="plan-b"><strong>Plan B</strong></span> — Eurotaxi Sarria <strong>"Pepe"</strong><br>
+                📞 <strong>606 98 78 78</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vuelta -->
+        <div class="log-card">
+          <div class="log-day-badge"><span class="dot"></span>21 o 22 agosto · Vuelta</div>
+          <h3>Regreso desde Santiago</h3>
+          <div class="log-items">
+            <div class="log-item">
+              <span class="log-item-icon">🥇</span>
+              <div class="log-item-txt"><strong>Plan A</strong> — David nos recoge en Santiago</div>
+            </div>
+            <div class="log-item">
+              <span class="log-item-icon">🥈</span>
+              <div class="log-item-txt">
+                <span class="plan-b"><strong>Plan B</strong></span> — Tren Santiago → Lugo<br>
+                Duración ~1h 20min
+              </div>
+            </div>
+            <div class="log-item">
+              <span class="log-item-icon">🥉</span>
+              <div class="log-item-txt">
+                <span class="plan-c"><strong>Plan C</strong></span> — Bus ALSA Santiago → Lugo
+              </div>
+            </div>
+          </div>
+          <div class="log-highlight">
+            <strong>Pendiente confirmar:</strong> ¿21 o 22 de agosto? Depende de si usamos la reserva de Santiago (cancelar antes del 19 ago si se decide no usar).
+          </div>
+        </div>
+
+        <!-- Notas importantes -->
+        <div class="log-card">
+          <div class="log-day-badge"><span class="dot"></span>Recordatorios</div>
+          <h3>Cosas que no olvidar</h3>
+          <div class="log-items">
+            <div class="log-item">
+              <span class="log-item-icon">📋</span>
+              <div class="log-item-txt">Credencial del peregrino — sellada en cada etapa</div>
+            </div>
+            <div class="log-item">
+              <span class="log-item-icon">🆔</span>
+              <div class="log-item-txt">DNI para los alojamientos (reservas a nombre de Eva Gomez)</div>
+            </div>
+            <div class="log-item">
+              <span class="log-item-icon">💳</span>
+              <div class="log-item-txt">Tarjeta Caixa ···3166 (PayPal vinculado a reservas)</div>
+            </div>
+            <div class="log-item">
+              <span class="log-item-icon">📞</span>
+              <div class="log-item-txt">Teléfono taxi Sarria — Pepe: <strong>606 98 78 78</strong></div>
+            </div>
+          </div>
+          <div class="log-warn">
+            ⚠️ <strong>Cancelar Ecorooms SCQ</strong> (Santiago) antes del <strong>19 de agosto</strong> si decidís volver el 21.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo"><span>Isra & Eva</span> · Nuestro Camino 2026</div>
+    <p>Zona privada · Solo para Isra & Eva</p>
+    <div class="ultreia">Ultreia! 🐚</div>
+  </footer>
+
+</div><!-- /private-content -->
+
+<script>
+/* =====================================================
+   CONTRASEÑA
+   Para cambiarla: modifica el valor de PASS_HASH
+   Usa: btoa("camino:" + tuNuevaContraseña)
+   Contraseña actual: ultreia26
+===================================================== */
+const PASS_HASH = "Y2FtaW5vOnVsdHJlaWEyNg=="; // = btoa("camino:ultreia26")
+const SESSION_KEY = "camino_privado_ok";
+
+function checkSession() {
+  if (sessionStorage.getItem(SESSION_KEY) === "1") unlock(false);
+}
+
+function unlock(animate) {
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('private-content').style.display = 'block';
+  if (animate !== false) sessionStorage.setItem(SESSION_KEY, "1");
+}
+
+function lockAgain() {
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('lock-screen').style.display = 'flex';
+  document.getElementById('private-content').style.display = 'none';
+  document.getElementById('pass-input').value = '';
+}
+
+document.getElementById('unlock-btn').addEventListener('click', tryUnlock);
+document.getElementById('pass-input').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+
+document.getElementById('toggle-pass').addEventListener('click', () => {
+  const inp = document.getElementById('pass-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+});
+
+function tryUnlock() {
+  const input = document.getElementById('pass-input').value.trim();
+  const err   = document.getElementById('lock-error');
+  const inp   = document.getElementById('pass-input');
+
+  if (btoa("camino:" + input) === PASS_HASH) {
+    err.classList.remove('visible');
+    inp.classList.remove('error');
+    unlock(true);
+  } else {
+    inp.classList.remove('error');
+    void inp.offsetWidth; // reflow para reiniciar animación
+    inp.classList.add('error');
+    err.classList.add('visible');
+    inp.value = '';
+    inp.focus();
+  }
+}
+
+checkSession();
+</script>
+</body>
+</html>
