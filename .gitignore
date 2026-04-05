@@ -1,0 +1,13 @@
+# Claves sensibles — nunca subir
+config.js
+
+# macOS
+.DS_Store
+
+# Editores
+.vscode/
+*.swp
+*.swo
+
+# Claude
+.claude/

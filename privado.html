@@ -295,6 +295,7 @@
       .logistica-grid { grid-template-columns:1fr; }
       .aloj-grid { grid-template-columns:1fr; }
       .total-row { flex-direction:column; align-items:flex-start; gap:0.25rem; }
+      #mensaje-dia .container > div { grid-template-columns:1fr !important; }
     }
   </style>
 </head>
@@ -305,7 +306,7 @@
   <ul class="nav-links">
     <li><a href="index.html">Inicio</a></li>
     <li><a href="ruta.html">La ruta</a></li>
-    <li><a href="diario.html">Diario</a></li>
+    <li><a href="mural.html">Mural</a></li>
   </ul>
   <a href="privado.html" class="nav-pill active">🔒 Zona privada</a>
 </nav>
@@ -706,6 +707,74 @@
     </div>
   </section>
 
+  <!-- ── MENSAJE DEL DÍA ── -->
+  <section class="private" id="mensaje-dia">
+    <div class="container">
+      <span class="section-label">Mural</span>
+      <h2 class="section-title">Mensaje del <em>día</em></h2>
+      <div class="divider-line"></div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start;">
+
+        <!-- Formulario -->
+        <div style="background:var(--blanco); border:1.5px solid var(--borde); border-radius:18px; padding:2rem;">
+          <p style="font-size:0.85rem; color:var(--texto-s); margin-bottom:1.5rem; line-height:1.6;">
+            Publica el mensaje del día en el mural — aparecerá destacado en dorado para toda la familia. Solo se muestra el del día actual.
+          </p>
+
+          <div style="margin-bottom:1rem;">
+            <label style="display:block; font-size:0.72rem; font-weight:500; text-transform:uppercase; letter-spacing:0.08em; color:var(--texto-s); margin-bottom:0.4rem;">Etapa de hoy</label>
+            <select id="msg-etapa" style="width:100%; padding:0.7rem 0.9rem; border:1.5px solid var(--borde); border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.9rem; color:var(--noche); background:var(--fondo); outline:none;">
+              <option value="1">Etapa 1 · Sarria → Portomarín (17 ago)</option>
+              <option value="2">Etapa 2 · Portomarín → Palas de Rei (18 ago)</option>
+              <option value="3">Etapa 3 · Palas de Rei → Arzúa (19 ago)</option>
+              <option value="4">Etapa 4 · Arzúa → O Pedrouzo (20 ago)</option>
+              <option value="5">Etapa 5 · O Pedrouzo → Santiago (21 ago)</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom:1.25rem;">
+            <label style="display:block; font-size:0.72rem; font-weight:500; text-transform:uppercase; letter-spacing:0.08em; color:var(--texto-s); margin-bottom:0.4rem;">Mensaje del día</label>
+            <textarea id="msg-dia-texto" rows="5" maxlength="400"
+              placeholder="Nos han salido 4 ampollas nuevas 😂 Pero seguimos adelante..."
+              style="width:100%; padding:0.75rem 0.9rem; border:1.5px solid var(--borde); border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.92rem; color:var(--noche); background:var(--fondo); resize:none; outline:none; line-height:1.6; transition:border-color 0.2s;"></textarea>
+            <div style="font-size:0.7rem; color:var(--texto-s); text-align:right; margin-top:3px;" id="msg-dia-count">0 / 400</div>
+          </div>
+
+          <button id="btn-publicar"
+            style="width:100%; padding:0.85rem; background:var(--marino); color:var(--blanco); border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.92rem; font-weight:500; cursor:pointer; transition:background 0.2s;">
+            Publicar en el mural
+          </button>
+          <div id="msg-dia-feedback" style="margin-top:0.85rem; padding:0.75rem 1rem; border-radius:8px; font-size:0.85rem; display:none;"></div>
+        </div>
+
+        <!-- Mensaje actual publicado -->
+        <div>
+          <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--texto-s); margin-bottom:0.75rem;">Mensaje publicado hoy</div>
+          <div id="msg-dia-actual"
+            style="background:rgba(245,200,66,0.06); border:1px solid rgba(245,200,66,0.3); border-radius:14px; padding:1.5rem; min-height:120px;">
+            <p style="font-size:0.88rem; color:var(--texto-s); font-style:italic;">Cargando…</p>
+          </div>
+
+          <div style="margin-top:1.5rem;">
+            <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--texto-s); margin-bottom:0.75rem;">También puedes escribir como Isra &amp; Eva</div>
+            <div style="background:var(--blanco); border:1.5px solid var(--borde); border-radius:14px; padding:1.25rem;">
+              <textarea id="msg-isra-texto" rows="3" maxlength="280"
+                placeholder="Un mensaje especial para el mural, firmado por Isra & Eva…"
+                style="width:100%; padding:0.6rem 0.75rem; border:1.5px solid var(--borde); border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.88rem; color:var(--noche); background:var(--fondo); resize:none; outline:none; line-height:1.6; margin-bottom:0.75rem;"></textarea>
+              <button id="btn-isra-eva"
+                style="width:100%; padding:0.65rem; background:var(--atlantico); color:var(--blanco); border:none; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:500; cursor:pointer; transition:background 0.2s;">
+                Publicar como Isra &amp; Eva
+              </button>
+              <div id="msg-isra-feedback" style="margin-top:0.6rem; font-size:0.8rem; display:none;"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <footer>
     <div class="footer-logo"><span>Isra & Eva</span> · Nuestro Camino 2026</div>
     <p>Zona privada · Solo para Isra & Eva</p>
@@ -719,9 +788,8 @@
    CONTRASEÑA
    Para cambiarla: modifica el valor de PASS_HASH
    Usa: btoa("camino:" + tuNuevaContraseña)
-   Contraseña actual: ultreia26
 ===================================================== */
-const PASS_HASH = "Y2FtaW5vOnVsdHJlaWEyNg=="; // = btoa("camino:ultreia26")
+const PASS_HASH = "Y2FtaW5vOnB1bHBv"; // = btoa("camino:pulpo")
 const SESSION_KEY = "camino_privado_ok";
 
 function checkSession() {
@@ -769,6 +837,126 @@ function tryUnlock() {
 }
 
 checkSession();
+</script>
+
+<!-- Firebase: mensaje del día + mensajes como Isra & Eva -->
+<script type="module">
+import { initializeApp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, push, onValue }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDZcka9Ue_yFmH23uCuqbKAgjHWkLPl66M",
+  authDomain: "camino-isra-eva-8b49b.firebaseapp.com",
+  databaseURL: "https://camino-isra-eva-8b49b-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "camino-isra-eva-8b49b",
+  storageBucket: "camino-isra-eva-8b49b.firebasestorage.app",
+  messagingSenderId: "543570348447",
+  appId: "1:543570348447:web:dee5e853a170fbd260d5aa"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+const hoyISO = new Date().toISOString().split('T')[0];
+
+/* ── LEER MENSAJE DEL DÍA ACTUAL ── */
+onValue(ref(db, 'mensaje_dia'), snap => {
+  const el = document.getElementById('msg-dia-actual');
+  if (!el) return;
+  if (snap.exists()) {
+    const m = snap.val();
+    el.innerHTML = `
+      <p style="font-family:'Cormorant Garamond',serif; font-size:1.15rem; font-style:italic; color:var(--marino); line-height:1.65; margin-bottom:0.6rem;">${esc(m.texto)}</p>
+      <p style="font-size:0.72rem; color:var(--texto-s);">Etapa ${m.etapa || '–'} · ${m.fecha || '–'}</p>`;
+  } else {
+    el.innerHTML = '<p style="font-size:0.88rem; color:var(--texto-s); font-style:italic;">Ningún mensaje publicado todavía hoy.</p>';
+  }
+});
+
+/* ── CONTADOR DE CARACTERES ── */
+const textareaDia = document.getElementById('msg-dia-texto');
+if (textareaDia) {
+  textareaDia.addEventListener('input', () => {
+    document.getElementById('msg-dia-count').textContent = textareaDia.value.length + ' / 400';
+  });
+}
+
+/* ── PUBLICAR MENSAJE DEL DÍA ── */
+const btnPublicar = document.getElementById('btn-publicar');
+if (btnPublicar) {
+  btnPublicar.addEventListener('click', async () => {
+    const texto  = (textareaDia.value || '').trim();
+    const etapa  = parseInt(document.getElementById('msg-etapa').value);
+    const fb     = document.getElementById('msg-dia-feedback');
+
+    if (!texto) { showFb(fb, 'err', 'Escribe un mensaje antes de publicar.'); return; }
+
+    btnPublicar.disabled = true;
+    btnPublicar.textContent = 'Publicando…';
+    try {
+      await set(ref(db, 'mensaje_dia'), { texto, fecha: hoyISO, etapa });
+      textareaDia.value = '';
+      document.getElementById('msg-dia-count').textContent = '0 / 400';
+      showFb(fb, 'ok', '¡Publicado! El banner ya aparece en el mural.');
+    } catch (e) {
+      showFb(fb, 'err', 'Error al publicar: ' + e.message);
+    } finally {
+      btnPublicar.disabled = false;
+      btnPublicar.textContent = 'Publicar en el mural';
+    }
+  });
+}
+
+/* ── PUBLICAR COMO ISRA & EVA ── */
+const btnIsraEva = document.getElementById('btn-isra-eva');
+if (btnIsraEva) {
+  btnIsraEva.addEventListener('click', async () => {
+    const texto = (document.getElementById('msg-isra-texto').value || '').trim();
+    const fb    = document.getElementById('msg-isra-feedback');
+
+    if (!texto) { showFb(fb, 'err', 'El mensaje no puede estar vacío.'); return; }
+
+    btnIsraEva.disabled = true;
+    btnIsraEva.textContent = 'Publicando…';
+    try {
+      await push(ref(db, 'mensajes'), {
+        autor: 'Isra & Eva',
+        texto,
+        fecha: new Date().toISOString(),
+        tipo:  'isra_eva',
+      });
+      document.getElementById('msg-isra-texto').value = '';
+      showFb(fb, 'ok', '¡Mensaje publicado en el mural!');
+    } catch (e) {
+      showFb(fb, 'err', 'Error: ' + e.message);
+    } finally {
+      btnIsraEva.disabled = false;
+      btnIsraEva.textContent = 'Publicar como Isra & Eva';
+    }
+  });
+}
+
+function showFb(el, tipo, msg) {
+  el.style.display = 'block';
+  el.style.padding = '0.6rem 0.85rem';
+  el.style.borderRadius = '8px';
+  if (tipo === 'ok') {
+    el.style.background = 'rgba(61,170,107,0.1)';
+    el.style.border = '1px solid rgba(61,170,107,0.3)';
+    el.style.color = '#3DAA6B';
+  } else {
+    el.style.background = 'rgba(224,92,92,0.1)';
+    el.style.border = '1px solid rgba(224,92,92,0.3)';
+    el.style.color = '#E05C5C';
+  }
+  el.textContent = msg;
+  setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 </script>
 </body>
 </html>

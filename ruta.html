@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Ruta · Isra & Eva 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --noche:     #0F2233;
+      --marino:    #1B4D6E;
+      --atlantico: #3A7CA5;
+      --bruma:     #88BDD8;
+      --cielo:     #E8F4F8;
+      --concha:    #F5C842;
+      --fondo:     #F4F8FB;
+      --blanco:    #FFFFFF;
+      --texto-s:   #4A6880;
+      --borde:     #C8DFF0;
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body { font-family:'DM Sans',sans-serif; background:var(--fondo); color:var(--noche); line-height:1.7; }
+
+    /* ── NAV ── */
+    nav {
+      position:fixed; top:0; width:100%; z-index:100;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 2.5rem; height:64px;
+      background:rgba(15,34,51,0.96); backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(136,189,216,0.15);
+    }
+    .nav-logo { font-family:'Cormorant Garamond',serif; font-size:1.15rem; font-style:italic; color:var(--blanco); text-decoration:none; }
+    .nav-logo strong { color:var(--concha); font-style:normal; font-weight:600; }
+    .nav-links { display:flex; gap:0.25rem; list-style:none; }
+    .nav-links a { color:rgba(232,244,248,0.7); text-decoration:none; font-size:0.82rem; font-weight:400; letter-spacing:0.07em; text-transform:uppercase; padding:0.4rem 0.9rem; border-radius:6px; transition:color 0.2s,background 0.2s; }
+    .nav-links a:hover { color:var(--blanco); background:rgba(255,255,255,0.07); }
+    .nav-links a.active { color:var(--concha); }
+    .nav-pill { background:var(--concha); color:var(--noche); font-size:0.78rem; font-weight:500; padding:0.35rem 1rem; border-radius:20px; text-decoration:none; letter-spacing:0.04em; transition:opacity 0.2s; }
+    .nav-pill:hover { opacity:0.85; }
+
+    /* ── HEADER ── */
+    .page-header {
+      padding: 8rem 1.5rem 4rem;
+      background:
+        linear-gradient(180deg, rgba(15,34,51,0.85) 0%, rgba(27,77,110,0.6) 60%, rgba(244,248,251,1) 100%),
+        url('https://images.unsplash.com/photo-1596207891316-3a2dc6b0c3bc?w=1600&q=80') center/cover no-repeat;
+      text-align:center;
+    }
+    .page-eyebrow {
+      display:inline-flex; align-items:center; gap:8px;
+      background:rgba(245,200,66,0.15); border:1px solid rgba(245,200,66,0.35); border-radius:20px;
+      color:var(--concha); font-size:0.75rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase;
+      padding:0.35rem 1rem; margin-bottom:1.5rem;
+    }
+    .page-h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(2.5rem,7vw,4.5rem); font-weight:600; color:var(--blanco); line-height:1.05; margin-bottom:0.75rem; }
+    .page-h1 em { font-style:italic; color:var(--concha); }
+    .page-sub { font-size:0.95rem; color:rgba(232,244,248,0.7); letter-spacing:0.06em; }
+
+    /* ── BARRA DE PROGRESO GLOBAL ── */
+    .progreso-global { background:var(--noche); padding:1.5rem 2.5rem; }
+    .pg-inner { max-width:1080px; margin:0 auto; display:grid; grid-template-columns:1fr auto; gap:2rem; align-items:center; }
+    .pg-labels { display:flex; justify-content:space-between; font-size:0.7rem; color:rgba(136,189,216,0.5); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
+    .pg-bar { height:6px; background:rgba(255,255,255,0.1); border-radius:6px; overflow:hidden; }
+    .pg-fill { height:100%; background:linear-gradient(90deg,var(--atlantico),var(--concha)); border-radius:6px; transition:width 1s ease; }
+    .pg-pct { font-family:'Cormorant Garamond',serif; font-size:2.8rem; font-weight:600; color:var(--concha); text-align:right; line-height:1; white-space:nowrap; }
+    .pg-pct small { display:block; font-family:'DM Sans',sans-serif; font-size:0.65rem; color:rgba(136,189,216,0.5); text-transform:uppercase; letter-spacing:0.1em; margin-top:3px; }
+
+    /* ── CONTAINER ── */
+    .container { max-width:1080px; margin:0 auto; padding:4rem 1.5rem; }
+
+    /* ── ACORDEÓN ── */
+    .acordeon { display:flex; flex-direction:column; gap:1rem; }
+
+    .etapa-card {
+      background:var(--blanco);
+      border:1.5px solid var(--borde);
+      border-radius:18px;
+      overflow:hidden;
+      transition:box-shadow 0.2s, border-color 0.2s;
+    }
+    .etapa-card:hover { box-shadow:0 4px 24px rgba(58,124,165,0.1); }
+    .etapa-card.activa { border-color:var(--atlantico); box-shadow:0 6px 32px rgba(58,124,165,0.15); }
+    .etapa-card.hoy { border-color:var(--concha); box-shadow:0 6px 32px rgba(245,200,66,0.2); }
+    .etapa-card.pasada { opacity:0.75; }
+
+    /* Header del acordeón */
+    .etapa-header {
+      display:grid; grid-template-columns:auto 1fr auto;
+      gap:1.5rem; align-items:center;
+      padding:1.5rem 2rem;
+      cursor:pointer;
+      user-select:none;
+      transition:background 0.2s;
+    }
+    .etapa-header:hover { background:var(--cielo); }
+    .etapa-card.activa .etapa-header { background:var(--cielo); }
+    .etapa-card.hoy .etapa-header { background:rgba(245,200,66,0.08); }
+
+    .etapa-num {
+      width:48px; height:48px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600;
+      background:var(--marino); color:var(--blanco);
+      flex-shrink:0;
+      transition:background 0.2s;
+    }
+    .etapa-card.hoy .etapa-num { background:var(--concha); color:var(--noche); }
+    .etapa-card.pasada .etapa-num { background:var(--bruma); }
+
+    .etapa-header-info {}
+    .etapa-fecha-tag { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--atlantico); font-weight:500; margin-bottom:2px; }
+    .etapa-card.hoy .etapa-fecha-tag { color:var(--concha); }
+    .etapa-ruta { font-family:'Cormorant Garamond',serif; font-size:1.45rem; font-weight:600; color:var(--noche); line-height:1.2; }
+    .etapa-chips { display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:0.4rem; }
+    .chip { font-size:0.75rem; color:var(--texto-s); display:flex; align-items:center; gap:3px; }
+
+    .etapa-header-right { display:flex; align-items:center; gap:1rem; }
+    .hoy-badge {
+      background:var(--concha); color:var(--noche);
+      font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em;
+      padding:0.25rem 0.7rem; border-radius:20px;
+    }
+    .completada-badge {
+      background:rgba(61,170,107,0.12); color:#3DAA6B; border:1px solid rgba(61,170,107,0.3);
+      font-size:0.68rem; font-weight:500; text-transform:uppercase; letter-spacing:0.08em;
+      padding:0.25rem 0.7rem; border-radius:20px;
+    }
+    .chevron {
+      width:24px; height:24px; border-radius:50%; background:var(--cielo);
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0; transition:transform 0.3s, background 0.2s;
+    }
+    .etapa-card.activa .chevron { transform:rotate(180deg); background:var(--borde); }
+    .chevron svg { width:14px; height:14px; stroke:var(--marino); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+    /* Cuerpo del acordeón */
+    .etapa-body {
+      max-height:0; overflow:hidden;
+      transition:max-height 0.45s cubic-bezier(0.4,0,0.2,1);
+    }
+    .etapa-card.activa .etapa-body { max-height:900px; }
+
+    .etapa-body-inner {
+      padding:0 2rem 2rem;
+      display:grid; grid-template-columns:1fr 340px;
+      gap:2rem;
+    }
+
+    /* Mapa de etapa */
+    .etapa-mapa-wrap {
+      border-radius:12px; overflow:hidden;
+      border:1.5px solid var(--borde);
+      height:280px;
+      background:var(--cielo);
+    }
+    .etapa-mapa { width:100%; height:100%; }
+
+    /* Detalle de etapa */
+    .etapa-detalle {}
+    .detalle-seccion { margin-bottom:1.5rem; }
+    .detalle-seccion:last-child { margin-bottom:0; }
+    .detalle-label { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--atlantico); font-weight:500; margin-bottom:0.6rem; }
+    .detalle-stat-row { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+    .detalle-stat { background:var(--cielo); border-radius:10px; padding:0.85rem 1rem; }
+    .detalle-stat .sv { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:600; color:var(--noche); display:block; line-height:1; }
+    .detalle-stat .sl { font-size:0.68rem; color:var(--texto-s); text-transform:uppercase; letter-spacing:0.08em; margin-top:2px; }
+
+    .pueblos-list { display:flex; flex-wrap:wrap; gap:5px; }
+    .pueblo-tag { background:var(--fondo); border:1px solid var(--borde); border-radius:20px; font-size:0.74rem; color:var(--texto-s); padding:0.2rem 0.65rem; }
+
+    .dato-curioso {
+      background:linear-gradient(135deg, rgba(27,77,110,0.06), rgba(58,124,165,0.08));
+      border:1px solid rgba(58,124,165,0.2); border-radius:12px;
+      padding:1rem 1.1rem;
+    }
+    .dato-curioso p { font-size:0.88rem; color:var(--marino); line-height:1.65; font-style:italic; }
+    .dato-curioso p::before { content:'"'; font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--concha); line-height:0; vertical-align:-0.4em; margin-right:3px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:768px) {
+      nav { padding:0 1.25rem; }
+      .nav-links { display:none; }
+      .progreso-global { padding:1.25rem; }
+      .pg-inner { grid-template-columns:1fr; gap:0.5rem; }
+      .pg-pct { text-align:left; font-size:2rem; }
+      .etapa-header { padding:1.1rem 1.25rem; gap:1rem; }
+      .etapa-body-inner { grid-template-columns:1fr; padding:0 1.25rem 1.5rem; }
+      .etapa-mapa-wrap { height:220px; }
+      .etapa-header-right { flex-direction:column; align-items:flex-end; gap:0.4rem; }
+      .container { padding:2.5rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="index.html" class="nav-logo"><strong>Isra & Eva</strong> · Nuestro Camino 2026</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="ruta.html" class="active">La ruta</a></li>
+    <li><a href="mural.html">Mural</a></li>
+  </ul>
+  <a href="privado.html" class="nav-pill">🔒 Zona privada</a>
+</nav>
+
+<!-- ── HEADER ── -->
+<div class="page-header">
+  <div class="page-eyebrow">Camino Francés · 115 km · 5 etapas</div>
+  <h1 class="page-h1">Nuestra <em>ruta</em></h1>
+  <p class="page-sub">Sarria → Santiago de Compostela · 17–21 agosto 2026</p>
+</div>
+
+<!-- ── BARRA PROGRESO GLOBAL ── -->
+<div class="progreso-global">
+  <div class="pg-inner">
+    <div>
+      <div class="pg-labels"><span>Sarria</span><span>Santiago</span></div>
+      <div class="pg-bar"><div class="pg-fill" id="pg-fill" style="width:0%"></div></div>
+    </div>
+    <div class="pg-pct" id="pg-pct">0%<small>completado</small></div>
+  </div>
+</div>
+
+<!-- ── ACORDEÓN DE ETAPAS ── -->
+<div class="container">
+  <div class="acordeon" id="acordeon"></div>
+</div>
+
+<!-- ── SCRIPTS ── -->
+<script src="config.js"></script>
+<script>
+const ETAPAS = [
+  {
+    num:1, fecha:'2026-08-17', fechaTxt:'Lunes, 17 de agosto',
+    origen:'Sarria', destino:'Portomarín',
+    km:22.4, horas:'~6h', desnivel:'+480m / -560m',
+    lat_o:42.7794, lng_o:-7.4149,
+    lat_d:42.8088, lng_d:-7.6161,
+    pctFin:20,
+    pueblos:['Vilei','O Mosteiro','A Serra','Cortiñas','A Brea','Ferreiros','A Pena','As Rozas','Moimentos','Peruscallo','Morgade','Mercadoiro','A Parrocha','Mirallos'],
+    curioso:'Abandonamos Sarria, el último punto desde el que se puede obtener la Compostela caminando. A partir de aquí, cada paso cuenta para el certificado.'
+  },
+  {
+    num:2, fecha:'2026-08-18', fechaTxt:'Martes, 18 de agosto',
+    origen:'Portomarín', destino:'Palas de Rei',
+    km:24.6, horas:'~6.5h', desnivel:'+580m / -510m',
+    lat_o:42.8088, lng_o:-7.6161,
+    lat_d:42.8728, lng_d:-7.8692,
+    pctFin:41,
+    pueblos:['Toxibó','Gonzar','Hospital da Cruz','Castromaior','Ventas de Narón','Ligonde','Airexe','Os Valos','Portos','Lestedo','A Brea'],
+    curioso:'Cruzamos el río Miño por el puente medieval reconstruido de Portomarín — el pueblo original quedó sumergido bajo el embalse de Belesar en 1962.'
+  },
+  {
+    num:3, fecha:'2026-08-19', fechaTxt:'Miércoles, 19 de agosto',
+    origen:'Palas de Rei', destino:'Arzúa',
+    km:29.1, horas:'~7.5h', desnivel:'+620m / -650m',
+    lat_o:42.8728, lng_o:-7.8692,
+    lat_d:42.9278, lng_d:-8.1606,
+    pctFin:67,
+    pueblos:['Ponte Campana','O Coto','Casanova','Leboreiro','Furelos','Melide','Boente','A Fraga Alta','Ribadiso de Baixo'],
+    curioso:'Pasamos por Melide, capital mundial del pulpo gallego. El pulpo a feira aquí no es opcional — es obligatorio. Con pan de millo y Ribeiro, claro.'
+  },
+  {
+    num:4, fecha:'2026-08-20', fechaTxt:'Jueves, 20 de agosto',
+    origen:'Arzúa', destino:'O Pedrouzo',
+    km:19.3, horas:'~5h', desnivel:'+390m / -420m',
+    lat_o:42.9278, lng_o:-8.1606,
+    lat_d:42.9100, lng_d:-8.3633,
+    pctFin:84,
+    pueblos:['Pregontoño','A Calzada','A Peroxa','As Quintas','Boavista','A Calle de Ferreiros','A Brea','A Rúa','Santa Irene','A Salceda'],
+    curioso:'La etapa más corta del camino. Ideal para tomar carrerilla — mañana cruzamos el Monte do Gozo y entramos en Santiago. La tensión ya se palpa en el ambiente.'
+  },
+  {
+    num:5, fecha:'2026-08-21', fechaTxt:'Viernes, 21 de agosto',
+    origen:'O Pedrouzo', destino:'Santiago de Compostela',
+    km:20.0, horas:'~5h', desnivel:'+310m / -380m',
+    lat_o:42.9100, lng_o:-8.3633,
+    lat_d:42.8782, lng_d:-8.5448,
+    pctFin:100,
+    pueblos:['Amenal','San Paio','Lavacolla','Vilamaior','San Marcos'],
+    curioso:'Desde el Monte do Gozo se ve por primera vez la Catedral. Los peregrinos medievales gritaban "¡Santiago!" y echaban a correr. Nosotros también tendremos que frenar las lágrimas.'
+  },
+];
+
+/* ── FASE POR FECHA ── */
+function getFaseIdx() {
+  const d = new Date();
+  const n = d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
+  if (n < 20260817) return -1;       // antes
+  if (n >= 20260822) return 5;       // llegada
+  return n - 20260817;               // 0..4
+}
+const faseIdx = getFaseIdx();
+
+/* ── PROGRESO GLOBAL ── */
+function calcPct() {
+  if (faseIdx < 0) return 0;
+  if (faseIdx >= 5) return 100;
+  return faseIdx === 0 ? 0 : ETAPAS[faseIdx-1].pctFin;
+}
+const pctGlobal = calcPct();
+document.getElementById('pg-fill').style.width = pctGlobal + '%';
+document.getElementById('pg-pct').innerHTML = pctGlobal + '%<small>completado</small>';
+
+/* ── CONSTRUIR ACORDEÓN ── */
+const mapIds = [];
+ETAPAS.forEach((e, i) => {
+  const esHoy     = faseIdx === i;
+  const esPasada  = faseIdx > i;
+  const abierta   = esHoy || (faseIdx < 0 && i === 0); // si es antes del camino, abre la primera
+
+  const cardCls = ['etapa-card',
+    esHoy ? 'hoy' : '',
+    esPasada ? 'pasada' : '',
+    abierta ? 'activa' : ''
+  ].filter(Boolean).join(' ');
+
+  const mapId = `mapa-etapa-${i}`;
+  mapIds.push(mapId);
+
+  const pueblosHtml = e.pueblos.map(p => `<span class="pueblo-tag">${p}</span>`).join('');
+
+  document.getElementById('acordeon').innerHTML += `
+  <div class="${cardCls}" id="card-${i}">
+    <div class="etapa-header" onclick="toggleEtapa(${i})">
+      <div class="etapa-num">${esPasada ? '✓' : e.num}</div>
+      <div class="etapa-header-info">
+        <div class="etapa-fecha-tag">${e.fechaTxt}</div>
+        <div class="etapa-ruta">${e.origen} → ${e.destino}</div>
+        <div class="etapa-chips">
+          <span class="chip">📍 ${e.km} km</span>
+          <span class="chip">⏱ ${e.horas}</span>
+          <span class="chip">⛰ ${e.desnivel}</span>
+        </div>
+      </div>
+      <div class="etapa-header-right">
+        ${esHoy ? '<span class="hoy-badge">↑ Hoy</span>' : ''}
+        ${esPasada ? '<span class="completada-badge">✓ Completada</span>' : ''}
+        <div class="chevron">
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="etapa-body">
+      <div class="etapa-body-inner">
+        <div class="etapa-mapa-wrap">
+          <div id="${mapId}" class="etapa-mapa"></div>
+        </div>
+        <div class="etapa-detalle">
+          <div class="detalle-seccion">
+            <div class="detalle-label">Estadísticas</div>
+            <div class="detalle-stat-row">
+              <div class="detalle-stat"><span class="sv">${e.km} km</span><span class="sl">distancia</span></div>
+              <div class="detalle-stat"><span class="sv">${e.horas}</span><span class="sl">tiempo aprox.</span></div>
+              <div class="detalle-stat" style="grid-column:1/-1;"><span class="sv" style="font-size:1.15rem;">${e.desnivel}</span><span class="sl">desnivel acumulado</span></div>
+            </div>
+          </div>
+          <div class="detalle-seccion">
+            <div class="detalle-label">Pueblos en ruta</div>
+            <div class="pueblos-list">${pueblosHtml}</div>
+          </div>
+          <div class="detalle-seccion">
+            <div class="dato-curioso"><p>${e.curioso}</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+});
+
+/* ── TOGGLE ACORDEÓN ── */
+function toggleEtapa(i) {
+  const card = document.getElementById(`card-${i}`);
+  const estaAbierta = card.classList.contains('activa');
+  // Cerrar todas
+  document.querySelectorAll('.etapa-card').forEach(c => c.classList.remove('activa'));
+  // Abrir esta si estaba cerrada
+  if (!estaAbierta) {
+    card.classList.add('activa');
+    // Inicializar mapa si no se ha hecho aún
+    if (!window._mapasIniciados) window._mapasIniciados = {};
+    if (!window._mapasIniciados[i]) {
+      window._mapasIniciados[i] = true;
+      setTimeout(() => initMapEtapa(i), 50);
+    }
+  }
+}
+
+/* ── MAPAS POR ETAPA ── */
+function initMapEtapa(i) {
+  const e = ETAPAS[i];
+  const el = document.getElementById(`mapa-etapa-${i}`);
+  if (!el || !window.google) return;
+
+  const midLat = (e.lat_o + e.lat_d) / 2;
+  const midLng = (e.lng_o + e.lng_d) / 2;
+
+  const map = new google.maps.Map(el, {
+    zoom: 10,
+    center: { lat: midLat, lng: midLng },
+    mapTypeId: 'terrain',
+    styles: [
+      { featureType:'water',     elementType:'geometry',    stylers:[{color:'#1B4D6E'}] },
+      { featureType:'landscape', elementType:'geometry',    stylers:[{color:'#E8F4F8'}] },
+      { featureType:'road',      elementType:'geometry',    stylers:[{color:'#FFFFFF'},{weight:0.8}] },
+      { featureType:'poi',       stylers:[{visibility:'off'}] },
+      { featureType:'transit',   stylers:[{visibility:'off'}] },
+      { featureType:'administrative', elementType:'labels.text.fill', stylers:[{color:'#4A6880'}] },
+    ],
+    disableDefaultUI: true,
+    zoomControl: true,
+  });
+
+  // Polilínea del tramo
+  new google.maps.Polyline({
+    path: [
+      { lat: e.lat_o, lng: e.lng_o },
+      { lat: e.lat_d, lng: e.lng_d },
+    ],
+    geodesic: true,
+    strokeColor: '#E05C5C',
+    strokeOpacity: 0.9,
+    strokeWeight: 3,
+    map: map,
+  });
+
+  // Marcador origen
+  new google.maps.Marker({
+    position: { lat: e.lat_o, lng: e.lng_o },
+    map: map, title: e.origen,
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 9, fillColor: '#F5C842', fillOpacity: 1,
+      strokeColor: '#FFFFFF', strokeWeight: 2,
+    },
+  });
+
+  // Marcador destino
+  new google.maps.Marker({
+    position: { lat: e.lat_d, lng: e.lng_d },
+    map: map, title: e.destino,
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 9,
+      fillColor: e.num === 5 ? '#F5C842' : '#3A7CA5',
+      fillOpacity: 1, strokeColor: '#FFFFFF', strokeWeight: 2,
+    },
+  });
+
+  // Ajustar bounds para que se vea toda la etapa
+  const bounds = new google.maps.LatLngBounds();
+  bounds.extend({ lat: e.lat_o, lng: e.lng_o });
+  bounds.extend({ lat: e.lat_d, lng: e.lng_d });
+  map.fitBounds(bounds, { top:30, right:30, bottom:30, left:30 });
+}
+
+/* ── INIT MAPAS ABIERTOS AL CARGAR ── */
+function initMapsVisibles() {
+  if (!window._mapasIniciados) window._mapasIniciados = {};
+  document.querySelectorAll('.etapa-card.activa').forEach(card => {
+    const i = parseInt(card.id.replace('card-',''));
+    if (!window._mapasIniciados[i]) {
+      window._mapasIniciados[i] = true;
+      initMapEtapa(i);
+    }
+  });
+}
+
+/* ── CARGA DINÁMICA API MAPS ── */
+window.initMapRuta = initMapsVisibles;
+(function() {
+  const s = document.createElement('script');
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${CONFIG.MAPS_API_KEY}&callback=initMapRuta`;
+  s.async = true; s.defer = true;
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>
